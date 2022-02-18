@@ -15,6 +15,7 @@ object MetalPricesApiClient {
                     .build()
             )
             .addConverterFactory(GsonConverterFactory.create())
+            .addCallAdapterFactory(EitherCallAdapterFactory())
             .build()
             .create(MetalPricesApi::class.java)
     }

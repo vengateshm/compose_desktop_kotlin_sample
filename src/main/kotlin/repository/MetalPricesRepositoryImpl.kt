@@ -4,15 +4,15 @@ import common.Result
 import data.network.MetalPricesApi
 import data.network.response.toMetalPrice
 import models.MetalPrice
+import models.errorMessage
 
 class MetalPricesRepositoryImpl(private val api: MetalPricesApi) : MetalPricesRepository {
     override suspend fun getMetalPrice(): Result<MetalPrice> {
-        return try {
-            val response = api.getMetalPrice()
-            Result.Success(response.toMetalPrice())
-        } catch (e: Exception) {
-            //Result.Error(e)
-            Result.Success(MetalPrice(0.0, 0.0))
-        }
+        val response = api.getMetalPrice()
+
+        return response.fold(
+            ifLeft = { apiError -> Result.Error(Throwable(apiError.errorMessage())) },
+            ifRight = { metalPricesResponse -> Result.Success(metalPricesResponse.toMetalPrice()) }
+        )
     }
 }
